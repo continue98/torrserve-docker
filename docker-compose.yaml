@@ -1,0 +1,44 @@
+version: '3.7'
+services:
+  torrserve:
+    image: ghcr.io/yourok/torrserver
+    build:
+      context: .
+      dockerfile: Dockerfile.dock
+    container_name: torrserve
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TS_DONTKILL=true
+      - TS_CONF_PATH=/opt/ts/config
+      - TS_LOG_PATH=/opt/ts/log
+      - TS_TORR_DIR=/opt/ts/torrents
+      - TS_PORT=55510
+    ports:
+      - "172.16.50.2:55510:55510"
+    volumes:
+      - config:/opt/ts/config
+      - log:/opt/ts/log
+      - torrents:/opt/ts/torrents
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:55510"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+
+    networks:
+      wg_net:
+        ipv4_address: 172.16.50.2
+
+volumes:
+  config:
+  log:
+  torrents:
+
+networks:
+  wg_net:
+    external: true
