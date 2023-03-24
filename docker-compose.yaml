@@ -2,14 +2,12 @@ version: '3.7'
 services:
   torrserve:
     image: ghcr.io/yourok/torrserver
+    privileged: true
     build:
       context: .
       dockerfile: Dockerfile.dock
     container_name: torrserve
     restart: unless-stopped
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
     environment:
       - PUID=1000
       - PGID=1000
@@ -19,7 +17,7 @@ services:
       - TS_TORR_DIR=/opt/ts/torrents
       - TS_PORT=55510
     ports:
-      - "172.16.50.2:55510:55510"
+      - "127.0.0.0:55510:55510"
     volumes:
       - config:/opt/ts/config
       - log:/opt/ts/log
